@@ -6,16 +6,16 @@
 </p>
 
 
-__A memory-based evasion technique which makes shellcode invisible from process start to end.__
+__Teknik penghindaran berbasis memori yang membuat shellcode tidak terlihat dari awal hingga akhir proses..__
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
 ## Motivation
-I wanted to share this shellcode self-injection POC to showcase some AV/EDR evasion concepts that may turn useful for Red Teaming. Just a few weeks ago I came up with a custom in-memory evasion technique which I named ShellGhost. This technique stems from the need for having __a code that executes an 'invisible' shellcode from process start to finish__.
+Saya ingin membagikan POC injeksi mandiri shellcode ini untuk menampilkan beberapa konsep penghindaran AV/EDR yang mungkin berguna untuk Red Teaming. Beberapa minggu yang lalu saya menemukan teknik penghindaran dalam memori khusus yang saya beri nama ShellGhost. Teknik ini berasal dari kebutuhan akan __kode yang mengeksekusi shellcode 'tak terlihat' dari proses awal hingga akhir__.
 
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------
-## Handling the Thread Execution Flow
-__ShellGhost relies on Vectored Exception Handling in combination with software breakpoints__ to cyclically stop thread execution, replace the executed breakpoint with a RC4-encrypted shellcode instruction, decrypt the instruction and resume execution after restoring memory protection to RX. When the subsequent EXCEPTION_BREAKPOINT is raised, the exception handler replaces the previous shellcode instruction with a new breakpoint so that the allocation will never disclose the complete shellcode in an unencrypted state. This happens inside a private memory page which is initially marked as READ/WRITE.
+##Menangani Alur Eksekusi Thread
+__ShellGhost mengandalkan Penanganan Pengecualian Vectored yang dikombinasikan dengan breakpoint perangkat lunak__ to cyclically stop thread execution, replace the executed breakpoint with a RC4-encrypted shellcode instruction, decrypt the instruction and resume execution after restoring memory protection to RX. When the subsequent EXCEPTION_BREAKPOINT is raised, the exception handler replaces the previous shellcode instruction with a new breakpoint so that the allocation will never disclose the complete shellcode in an unencrypted state. This happens inside a private memory page which is initially marked as READ/WRITE.
 Having a RW PRV allocation will not be considered an 'Indicator of Compromise' by memory scanners such as PE-Sieve and Moneta. When the allocation becomes RX and the page is scanned, nothing but breakpoints will be found. This happens while the shellcode is actually under execution. The following picture shows that a reverse shell is running, but no IOC is found by Moneta (other than the binary being unsigned).
 
 
